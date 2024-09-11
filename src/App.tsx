@@ -8,7 +8,15 @@ interface IGenreList {
   id: number;
   name: string;
 }
-export interface IMovie {}
+export interface IMovie {
+  id: number;
+  title: string;
+  popularity: number;
+  overview: string;
+  realiseDate: string;
+  voteAverage: number;
+  posterPath: string;
+}
 
 interface IAppState {
   movieList: null | IMovie[];

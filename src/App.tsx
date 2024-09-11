@@ -47,10 +47,45 @@ class App extends Component<object, IAppState> {
     });
   }
 
+  replaceGenreIds(movieList: IMovie[], genreList: IGenreList[]) {
+    return movieList.map(
+      ({
+        id,
+        title,
+        popularity,
+        overview,
+        realiseDate,
+        voteAverage,
+        posterPath,
+        genreIds,
+      }) => {
+        return {
+          id,
+          title,
+          popularity,
+          overview,
+          realiseDate,
+          voteAverage,
+          posterPath,
+          genreName: genreIds.map((genreId) => {
+            const genre = genreList.find(({ id }) => id === genreId);
+            return genre!.name;
+          }),
+        };
+      }
+    );
+  }
+
   render(): ReactNode {
     const { movieList, genreList, loading } = this.state;
 
     if (loading) return <Loader />;
+
+    const updateMovieList = this.replaceGenreIds(
+      movieList as unknown as IMovie[],
+      genreList as unknown as IGenreList[]
+    );
+
     return <></>;
   }
 }

@@ -1,5 +1,6 @@
 import { Component, ReactNode } from "react";
 import { MovieAPI } from "./movieAPI/MovieAPI";
+import { Loader } from "./components/Loader/Loader";
 
 import "./App.css";
 
@@ -47,7 +48,7 @@ class App extends Component<object, IAppState> {
     this.movieAPI.getGenreArray().then((genres) => {
       this.setState({
         genreList: genres,
-        loading: false,
+        // loading: false,
       });
     });
   }
@@ -55,7 +56,7 @@ class App extends Component<object, IAppState> {
   render(): ReactNode {
     const { movieList, genreList, loading } = this.state;
 
-    if (loading) return <></>;
+    if (loading) return <Loader />;
     return <></>;
   }
 }

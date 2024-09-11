@@ -1,6 +1,7 @@
 import { Component, ReactNode } from "react";
 import { MovieAPI } from "./movieAPI/MovieAPI";
 import { Loader } from "./components/Loader/Loader";
+import { FilmList } from "./components/FilmList/FilmList";
 
 import "./App.css";
 
@@ -86,7 +87,7 @@ class App extends Component<object, IAppState> {
       genreList as unknown as IGenreList[]
     );
 
-    return <></>;
+    return <FilmList movieList={updateMovieList} />;
   }
 }
 

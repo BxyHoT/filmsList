@@ -1,8 +1,15 @@
 import { Component } from "react";
 import { Row, Pagination } from "antd";
 import "./FilmList.css";
+import { IMovie } from "../../App";
 
-export class FilmList extends Component {
+export interface IMovieWithGenres extends Omit<IMovie, "genreIds"> {
+  genreNames: string[];
+}
+interface IFilmListProps {
+  movieList: IMovieWithGenres[];
+}
+export class FilmList extends Component<IFilmListProps> {
   state = {
     currentPage: 1,
   };

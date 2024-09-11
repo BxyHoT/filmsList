@@ -1,5 +1,5 @@
 export class MovieAPI {
-  async getMovies() {
+  async getResurce(url: string) {
     const options = {
       method: "GET",
       headers: {
@@ -9,11 +9,20 @@ export class MovieAPI {
       },
     };
 
-    const movies = await fetch(
-      "https://api.themoviedb.org/3/account/21511753/watchlist/movies?language=en-US&page=1&sort_by=created_at.asc",
-      options
-    );
+    const resurce = await fetch(url, options);
 
-    return await movies.json();
+    return await resurce.json();
+  }
+
+  async getAllMovies(page = 1) {
+    return await this.getResurce(
+      `https://api.themoviedb.org/3/search/movie?query=return&include_adult=false&language=en-US&page=${page}`
+    ).then((movies) => movies.results);
+  }
+
+  async getGenreArray() {
+    return await this.getResurce(
+      "https://api.themoviedb.org/3/genre/movie/list?language=en"
+    ).then((genres) => genres.genres);
   }
 }

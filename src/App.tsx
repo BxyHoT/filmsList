@@ -53,7 +53,10 @@ class App extends Component<object, IAppState> {
   }
 
   render(): ReactNode {
-    return <div></div>;
+    const { movieList, genreList, loading } = this.state;
+
+    if (loading) return <></>;
+    return <></>;
   }
 }
 

@@ -67,7 +67,7 @@ class App extends Component<object, IAppState> {
           realiseDate,
           voteAverage,
           posterPath,
-          genreName: genreIds.map((genreId) => {
+          genreNames: genreIds.map((genreId) => {
             const genre = genreList.find(({ id }) => id === genreId);
             return genre!.name;
           }),

@@ -48,7 +48,7 @@ class App extends Component<object, IAppState> {
     this.movieAPI.getGenreArray().then((genres) => {
       this.setState({
         genreList: genres,
-        // loading: false,
+        loading: false,
       });
     });
   }

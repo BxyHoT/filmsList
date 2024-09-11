@@ -1,0 +1,5 @@
+.FilmList {
+  display: flex;
+  justify-content: center;
+  max-width: 1120px;
+}

@@ -55,6 +55,7 @@ export class MovieAPI {
           popularity,
           poster_path,
           title,
+          genre_ids,
         }: IMovie) => {
           return {
             id,
@@ -64,6 +65,7 @@ export class MovieAPI {
             realiseDate: format(release_date, "MMMM d, yyyy"),
             voteAverage: vote_average,
             posterPath: "https://image.tmdb.org/t/p/w500" + poster_path,
+            genreIds: genre_ids,
           };
         }
       )

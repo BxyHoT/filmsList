@@ -16,6 +16,7 @@ export interface IMovie {
   realiseDate: string;
   voteAverage: number;
   posterPath: string;
+  genreIds: number[];
 }
 
 interface IAppState {

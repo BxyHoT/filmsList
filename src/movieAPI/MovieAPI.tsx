@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 interface IMovie {
   adult: boolean;
@@ -9,7 +9,7 @@ interface IMovie {
   original_title: string;
   overview: string;
   popularity: number;
-  poster_path: string;
+  poster_path: string | null;
   release_date: string;
   title: string;
   video: boolean;
@@ -21,7 +21,7 @@ export class MovieAPI {
   getTrimOwerview(overview: string) {
     const trimOwerview = overview.split(" ");
     if (trimOwerview.length > 30) {
-      return trimOwerview.slice(0, 29).join(" ") + "...";
+      return trimOwerview.slice(0, 29).join(" ") + " ...";
     }
 
     return overview;
@@ -57,14 +57,31 @@ export class MovieAPI {
           title,
           genre_ids,
         }: IMovie) => {
+          let date: Date | string;
+
+          if (release_date === "") {
+            date = "No date";
+          } else {
+            date = parseISO(release_date);
+            date = format(date, "MMMM d, yyyy");
+          }
+
+          let posterPath;
+
+          if (poster_path === null) {
+            posterPath = "";
+          } else {
+            posterPath = "https://image.tmdb.org/t/p/w500" + poster_path;
+          }
+
           return {
             id,
             popularity,
             title,
             overview: this.getTrimOwerview(overview),
-            realiseDate: format(release_date, "MMMM d, yyyy"),
+            realiseDate: date,
             voteAverage: vote_average,
-            posterPath: "https://image.tmdb.org/t/p/w500" + poster_path,
+            posterPath: posterPath,
             genreIds: genre_ids,
           };
         }

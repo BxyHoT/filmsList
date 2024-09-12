@@ -1,17 +1,21 @@
 import { Component } from "react";
-import { IMovieWithGenres } from "../FilmList/FilmList";
+import { IMovie } from "../../App";
 import { Col } from "antd";
+import { FilmCard } from "../Card/FilmCard";
+import "./FilmListItem.css";
 
 interface IFilmListItemProps {
-  films: IMovieWithGenres[];
+  films: IMovie[];
 }
 
-export class FilmItemList extends Component<IFilmListItemProps> {
+export class FilmListItem extends Component<IFilmListItemProps> {
   render() {
     const { films } = this.props;
-    const filmList = films.map(({ id }) => {
-      <Col span={12} key={id}></Col>;
-    });
+    const filmList = films.map((movie) => (
+      <Col span={12} key={movie.id}>
+        <FilmCard movie={movie}></FilmCard>
+      </Col>
+    ));
 
     return <>{filmList}</>;
   }

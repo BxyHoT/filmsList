@@ -2,13 +2,10 @@ import { Component } from "react";
 import { Row, Pagination } from "antd";
 import "./FilmList.css";
 import { IMovie } from "../../App";
-import { FilmItemList } from "../FilmListItem/FilmListItem";
+import { FilmListItem } from "../FilmListItem/FilmListItem";
 
-export interface IMovieWithGenres extends Omit<IMovie, "genreIds"> {
-  genreNames: string[];
-}
 interface IFilmListProps {
-  movieList: IMovieWithGenres[];
+  movieList: IMovie[];
 }
 export class FilmList extends Component<IFilmListProps> {
   state = {
@@ -31,9 +28,9 @@ export class FilmList extends Component<IFilmListProps> {
     );
 
     return (
-      <div>
+      <div className="FilmList">
         <Row gutter={[16, 16]}>
-          <FilmItemList films={currentFilms} />
+          <FilmListItem films={currentFilms} />
         </Row>
         <Pagination
           current={currentPage}

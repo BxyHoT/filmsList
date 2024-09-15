@@ -1,6 +1,7 @@
 import { format, parseISO } from "date-fns";
+import { IMovie } from "../components/FilmList/FilmList";
 
-interface IMovie {
+interface MovieDTO {
   adult: boolean;
   backdrop_path: string;
   genre_ids: number[];
@@ -15,6 +16,11 @@ interface IMovie {
   video: boolean;
   vote_average: number;
   vote_count: number;
+}
+
+interface IMovieResponce {
+  movieList: IMovie[] | [];
+  totalPages: number;
 }
 
 export class MovieAPI {
@@ -49,8 +55,17 @@ export class MovieAPI {
     return await this.getResurce(
       `https://api.themoviedb.org/3/search/movie?query=return&include_adult=false&language=en-US&page=${page}`
     )
-      .then((movies) =>
-        movies.results.map(
+      .then((movies): IMovieResponce => {
+        const totalPages: number = movies.total_pages;
+
+        if (movies.results.length === 0) {
+          return {
+            movieList: [],
+            totalPages,
+          };
+        }
+
+        const movieList = movies.results.map(
           ({
             id,
             overview,
@@ -60,7 +75,7 @@ export class MovieAPI {
             poster_path,
             title,
             genre_ids,
-          }: IMovie) => {
+          }: MovieDTO) => {
             let date: Date | string;
 
             if (release_date === "") {
@@ -89,10 +104,15 @@ export class MovieAPI {
               genreIds: genre_ids,
             };
           }
-        )
-      )
+        );
+        return {
+          totalPages,
+          movieList,
+        };
+      })
       .catch((err) => {
         console.error("Ошибка фетча ", err);
+        return { totalPages: 0, movieList: [] as [] };
       });
   }
 

@@ -1,26 +1,53 @@
 import { Component } from "react";
 import { Row, Pagination } from "antd";
 import "./FilmList.css";
-import { IMovie } from "../../App";
 import { FilmListItem } from "../FilmListItem/FilmListItem";
+import { MovieAPI } from "../../movieAPI/MovieAPI";
 
-interface IFilmListProps {
-  movieList: IMovie[];
+export interface IMovie {
+  id: number;
+  title: string;
+  popularity: number;
+  overview: string;
+  realiseDate: string;
+  voteAverage: number;
+  posterPath: string;
+  genreIds: number[];
 }
-export class FilmList extends Component<IFilmListProps> {
+
+interface IFilmListState {
+  movieList: IMovie[] | [];
+  loading: boolean;
+  error: boolean;
+  currentPage: number;
+  totalPages: number | null;
+}
+export class FilmList extends Component<object, IFilmListState> {
+  movieAPI = new MovieAPI();
+
   state = {
+    movieList: [],
+    loading: true,
+    error: false,
     currentPage: 1,
+    totalPages: null,
   };
 
-  ITEMS_PER_PAGE = 10;
+  componentDidMount() {
+    this.movieAPI.getAllMovies().then(({ movieList, totalPages }) => {
+      this.setState({ movieList, totalPages });
+    });
+  }
+
+  ITEMS_PER_PAGE = 20;
 
   handleChange = (page: number) => {
-    this.setState({ curentPage: page });
+    console.log(page);
+    this.setState({ currentPage: page });
   };
 
   render() {
-    const { currentPage } = this.state;
-    const { movieList } = this.props;
+    const { currentPage, movieList, loading, error, totalPages } = this.state;
     const startIndex = (currentPage - 1) * this.ITEMS_PER_PAGE;
     const currentFilms = movieList.slice(
       startIndex,
@@ -38,6 +65,7 @@ export class FilmList extends Component<IFilmListProps> {
           align="center"
           style={{ marginTop: 16 }}
           onChange={this.handleChange}
+          total={totalPages as unknown as number}
         />
       </div>
     );

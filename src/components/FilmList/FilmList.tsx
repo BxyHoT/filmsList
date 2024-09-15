@@ -3,6 +3,9 @@ import { Row, Pagination } from "antd";
 import "./FilmList.css";
 import { FilmListItem } from "../FilmListItem/FilmListItem";
 import { MovieAPI } from "../../movieAPI/MovieAPI";
+import { Spin } from "antd";
+import { Alert } from "antd";
+import { IMovieResponce } from "../../movieAPI/MovieAPI";
 
 export interface IMovie {
   id: number;
@@ -21,6 +24,7 @@ interface IFilmListState {
   error: boolean;
   currentPage: number;
   totalPages: number | null;
+  isEmptyResponce: boolean;
 }
 export class FilmList extends Component<object, IFilmListState> {
   movieAPI = new MovieAPI();
@@ -31,33 +35,85 @@ export class FilmList extends Component<object, IFilmListState> {
     error: false,
     currentPage: 1,
     totalPages: null,
+    isEmptyResponce: false,
   };
 
-  componentDidMount() {
-    this.movieAPI.getAllMovies().then(({ movieList, totalPages }) => {
-      this.setState({ movieList, totalPages });
-    });
-  }
+  onError = () => {
+    console.log("error yopta");
+    this.setState({ error: true, loading: false });
+  };
+
+  onLoaded = ({ movieList, totalPages }: IMovieResponce) => {
+    if (movieList.length === 0) {
+      this.setState({
+        movieList,
+        totalPages,
+        loading: false,
+        error: false,
+        isEmptyResponce: true,
+      });
+    } else {
+      this.setState({
+        movieList,
+        totalPages,
+        loading: false,
+        error: false,
+        isEmptyResponce: false,
+      });
+    }
+  };
 
   ITEMS_PER_PAGE = 20;
 
   handleChange = (page: number) => {
-    console.log(page);
+    this.movieAPI
+      .getAllMovies(page)
+      .then((response) => this.onLoaded(response as IMovieResponce))
+      .catch(this.onError);
+
     this.setState({ currentPage: page });
+
+    window.scrollTo(0, 0);
   };
 
+  componentDidMount() {
+    this.movieAPI
+      .getAllMovies()
+      .then((response) => this.onLoaded(response as IMovieResponce))
+      .catch(this.onError);
+  }
+
+  componentDidUpdate() {}
+
   render() {
-    const { currentPage, movieList, loading, error, totalPages } = this.state;
-    const startIndex = (currentPage - 1) * this.ITEMS_PER_PAGE;
-    const currentFilms = movieList.slice(
-      startIndex,
-      startIndex + this.ITEMS_PER_PAGE
-    );
+    const {
+      currentPage,
+      movieList,
+      loading,
+      error,
+      totalPages,
+      isEmptyResponce,
+    } = this.state;
+
+    if (loading) {
+      return <Spin size="large" tip="Loading..." fullscreen={true}></Spin>;
+    }
+
+    if (error) {
+      return <Alert type="error" message="Ошибка запроса" closable />;
+    }
 
     return (
       <div className="FilmList">
+        {isEmptyResponce && (
+          <Alert
+            type="warning"
+            description="Нет такого фильма("
+            closable
+          ></Alert>
+        )}
         <Row gutter={[16, 16]}>
-          <FilmListItem films={currentFilms} />
+          <FilmListItem films={movieList} />
         </Row>
         <Pagination
           current={currentPage}
@@ -66,6 +122,8 @@ export class FilmList extends Component<object, IFilmListState> {
           style={{ marginTop: 16 }}
           onChange={this.handleChange}
           total={totalPages as unknown as number}
+          showSizeChanger={false}
+          hideOnSinglePage={isEmptyResponce}
         />
       </div>
     );

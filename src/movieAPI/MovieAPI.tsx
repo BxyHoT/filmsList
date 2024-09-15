@@ -18,7 +18,7 @@ interface MovieDTO {
   vote_count: number;
 }
 
-interface IMovieResponce {
+export interface IMovieResponce {
   movieList: IMovie[] | [];
   totalPages: number;
 }
@@ -51,12 +51,12 @@ export class MovieAPI {
     return await resurce.json();
   }
 
-  async getAllMovies(page = 1) {
+  async getAllMovies(page = 1, searchWord = "return") {
     return await this.getResurce(
-      `https://api.themoviedb.org/3/search/movie?query=return&include_adult=false&language=en-US&page=${page}`
+      `https://api.themoviedb.org/3/search/movie?query=${searchWord}&include_adult=false&language=en-US&page=${page}`
     )
       .then((movies): IMovieResponce => {
-        const totalPages: number = movies.total_pages;
+        const totalPages: number = movies.total_results;
 
         if (movies.results.length === 0) {
           return {
@@ -112,7 +112,6 @@ export class MovieAPI {
       })
       .catch((err) => {
         console.error("Ошибка фетча ", err);
-        return { totalPages: 0, movieList: [] as [] };
       });
   }
 

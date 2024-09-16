@@ -1,7 +1,7 @@
 import { Component } from "react";
-import { IMovie } from "../../App";
 import { Card } from "antd";
 import { CSSProperties } from "react";
+import { IMovie } from "../FilmList/FilmList";
 
 interface ICardProps {
   movie: IMovie;
@@ -41,9 +41,9 @@ export class FilmCard extends Component<ICardProps> {
     return (
       <Card style={cardStyle} cover={getPoster()}>
         <Card.Grid style={aboutStyle} hoverable={false}>
-          <h2>{title}</h2>
-          <p>{realiseDate}</p>
-          <p>{overview}</p>
+          <h2 style={{ fontSize: 20 }}>{title}</h2>
+          <p style={{ fontSize: 12 }}>{realiseDate}</p>
+          <p style={{ fontSize: 12 }}>{overview}</p>
         </Card.Grid>
       </Card>
     );

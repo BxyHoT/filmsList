@@ -2,7 +2,6 @@ import { Component } from "react";
 import { IMovie } from "../FilmList/FilmList";
 import { Col } from "antd";
 import { FilmCard } from "../Card/FilmCard";
-import "./FilmListItem.css";
 
 interface IFilmListItemProps {
   films: IMovie[];

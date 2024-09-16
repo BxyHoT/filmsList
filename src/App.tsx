@@ -4,16 +4,22 @@ import { FilmList } from "./components/FilmList/FilmList";
 import "./App.css";
 
 interface IAppState {
-  searchType: null | string;
+  searchType: string;
 }
 class App extends Component<object, IAppState> {
-  state = { searchType: null };
+  state = { searchType: "return" };
+
+  handleChengeSearchType = (value: string) => {
+    this.setState({ searchType: value });
+  };
 
   render(): ReactNode {
+    const { searchType } = this.state;
+
     return (
       <>
-        <SearchBar></SearchBar>
-        <FilmList />
+        <SearchBar handleChengeSearchType={this.handleChengeSearchType} />
+        <FilmList searchType={searchType} />
       </>
     );
   }

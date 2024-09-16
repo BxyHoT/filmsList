@@ -25,7 +25,11 @@ interface IFilmListState {
   totalPages: number | null;
   isEmptyResponce: boolean;
 }
-export class FilmList extends Component<object, IFilmListState> {
+
+interface IFilmListProps {
+  searchType: string;
+}
+export class FilmList extends Component<IFilmListProps, IFilmListState> {
   movieAPI = new MovieAPI();
 
   state = {
@@ -77,12 +81,35 @@ export class FilmList extends Component<object, IFilmListState> {
       .catch(this.onError);
   }
 
-  componentDidUpdate(prevProps, prevState: IFilmListState) {
+  componentDidUpdate(prevProps: IFilmListProps, prevState: IFilmListState) {
     if (this.state.currentPage !== prevState.currentPage) {
-      this.movieAPI
-        .getAllMovies(this.state.currentPage)
-        .then((response) => this.onLoaded(response as IMovieResponce))
-        .catch(this.onError);
+      if (this.props.searchType === "") {
+        this.movieAPI
+          .getAllMovies(this.state.currentPage, "return")
+          .then((response) => this.onLoaded(response as IMovieResponce))
+          .catch(this.onError);
+      } else {
+        this.movieAPI
+          .getAllMovies(this.state.currentPage, this.props.searchType)
+          .then((response) => this.onLoaded(response as IMovieResponce))
+          .catch(this.onError);
+      }
+    }
+
+    if (prevProps.searchType !== this.props.searchType) {
+      if (this.props.searchType === "") {
+        this.movieAPI
+          .getAllMovies(1, "return")
+          .then((response) => this.onLoaded(response as IMovieResponce))
+          .catch(this.onError);
+      } else {
+        this.setState({ currentPage: 1 });
+
+        this.movieAPI
+          .getAllMovies(1, this.props.searchType)
+          .then((response) => this.onLoaded(response as IMovieResponce))
+          .catch(this.onError);
+      }
     }
   }
 

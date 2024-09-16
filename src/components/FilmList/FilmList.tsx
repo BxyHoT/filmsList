@@ -1,6 +1,5 @@
 import { Component } from "react";
 import { Row, Pagination } from "antd";
-import "./FilmList.css";
 import { FilmListItem } from "../FilmListItem/FilmListItem";
 import { MovieAPI } from "../../movieAPI/MovieAPI";
 import { Spin } from "antd";
@@ -66,14 +65,9 @@ export class FilmList extends Component<object, IFilmListState> {
   ITEMS_PER_PAGE = 20;
 
   handleChange = (page: number) => {
-    this.movieAPI
-      .getAllMovies(page)
-      .then((response) => this.onLoaded(response as IMovieResponce))
-      .catch(this.onError);
-
-    this.setState({ currentPage: page });
-
     window.scrollTo(0, 0);
+
+    this.setState({ loading: true, currentPage: page });
   };
 
   componentDidMount() {
@@ -83,7 +77,14 @@ export class FilmList extends Component<object, IFilmListState> {
       .catch(this.onError);
   }
 
-  componentDidUpdate() {}
+  componentDidUpdate(prevProps, prevState: IFilmListState) {
+    if (this.state.currentPage !== prevState.currentPage) {
+      this.movieAPI
+        .getAllMovies(this.state.currentPage)
+        .then((response) => this.onLoaded(response as IMovieResponce))
+        .catch(this.onError);
+    }
+  }
 
   render() {
     const {

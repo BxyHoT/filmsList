@@ -74,6 +74,13 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
     this.setState({ loading: true, currentPage: page });
   };
 
+  fetchByDefoult = () => {
+    this.movieAPI
+      .getAllMovies(this.state.currentPage, "return")
+      .then((response) => this.onLoaded(response as IMovieResponce))
+      .catch(this.onError);
+  };
+
   componentDidMount() {
     this.movieAPI
       .getAllMovies()
@@ -84,10 +91,7 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
   componentDidUpdate(prevProps: IFilmListProps, prevState: IFilmListState) {
     if (this.state.currentPage !== prevState.currentPage) {
       if (this.props.searchType === "") {
-        this.movieAPI
-          .getAllMovies(this.state.currentPage, "return")
-          .then((response) => this.onLoaded(response as IMovieResponce))
-          .catch(this.onError);
+        this.fetchByDefoult();
       } else {
         this.movieAPI
           .getAllMovies(this.state.currentPage, this.props.searchType)
@@ -98,10 +102,7 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
 
     if (prevProps.searchType !== this.props.searchType) {
       if (this.props.searchType === "") {
-        this.movieAPI
-          .getAllMovies(1, "return")
-          .then((response) => this.onLoaded(response as IMovieResponce))
-          .catch(this.onError);
+        this.fetchByDefoult();
       } else {
         this.setState({ currentPage: 1 });
 

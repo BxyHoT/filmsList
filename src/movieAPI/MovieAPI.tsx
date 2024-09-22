@@ -23,9 +23,20 @@ export interface IMovieResponce {
   totalPages: number;
 }
 
+export interface IGenre {
+  id: number;
+  name: string;
+}
+
 export class MovieAPI {
-  getTrimOwerview(overview: string) {
+  Authorization =
+    "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkMWNiMGQzOTNhZWM4OTY3NzJiNjNhNDU1MTlkMzUxZiIsIm5iZiI6MTcyNTk3MjQwNC40Njg2NzgsInN1YiI6IjY2ZTAzYTJkMDAwMDAwMDAwMGE0NmFiMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.gBHXD4cjeOlAyUFuebJVVXxBNZFdWE1KSCl84IpTRXM";
+
+  getTrimOwerview(overview: string, title: string) {
     const trimOwerview = overview.split(" ");
+
+    if (title.split(" ").length > 20) return "";
+
     if (trimOwerview.length > 30) {
       return trimOwerview.slice(0, 29).join(" ") + " ...";
     }
@@ -38,8 +49,7 @@ export class MovieAPI {
       method: "GET",
       headers: {
         accept: "application/json",
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkMWNiMGQzOTNhZWM4OTY3NzJiNjNhNDU1MTlkMzUxZiIsIm5iZiI6MTcyNTk3MjQwNC40Njg2NzgsInN1YiI6IjY2ZTAzYTJkMDAwMDAwMDAwMGE0NmFiMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.gBHXD4cjeOlAyUFuebJVVXxBNZFdWE1KSCl84IpTRXM",
+        Authorization: this.Authorization,
       },
     };
 
@@ -97,7 +107,7 @@ export class MovieAPI {
               id,
               popularity,
               title,
-              overview: this.getTrimOwerview(overview),
+              overview: this.getTrimOwerview(overview, title),
               realiseDate: date,
               voteAverage: vote_average,
               posterPath: posterPath,
@@ -115,9 +125,58 @@ export class MovieAPI {
       });
   }
 
-  async getGenreArray() {
+  getGenreArray = async () => {
     return await this.getResurce(
       "https://api.themoviedb.org/3/genre/movie/list?language=en"
-    ).then((genres) => genres.genres);
+    )
+      .then((genres): IGenre[] => genres.genres)
+      .catch((err) => {
+        console.error("Ответ говна на жанрах", err);
+        return null;
+      });
+  };
+
+  guestSession = async () => {
+    return await this.getResurce(
+      "https://api.themoviedb.org/3/authentication/guest_session/new"
+    );
+  };
+
+  async setScore(score: string, guestSession: string, id: number) {
+    const options = {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json;charset=utf-8",
+        Authorization: this.Authorization,
+      },
+      body: JSON.stringify({ value: score }),
+    };
+
+    return await fetch(
+      `https://api.themoviedb.org/3/movie/${id}}/rating?guest_session_id=${guestSession}`,
+      options
+    )
+      .then((response) => response.json())
+      .then((response) => console.log(response))
+      .catch((err) => console.error(err));
+  }
+
+  async getRaited(guestSession: string) {
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization: this.Authorization,
+      },
+    };
+
+    return await fetch(
+      `https://api.themoviedb.org/3/guest_session/${guestSession}/rated/movies?language=en-US&page=1&sort_by=created_at.asc`,
+      options
+    )
+      .then((response) => response.json())
+      .then((response) => console.log(response))
+      .catch((err) => console.error(err));
   }
 }

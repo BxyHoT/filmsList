@@ -1,6 +1,8 @@
 .ant-input-group-addon:last-child {
   display: none;
 }
-.ant-input-group-addon:first-child {
+
+:where(.css-dev-only-do-not-override-qnu6hi).ant-input-group
+  > .ant-input:first-child {
   border-radius: 6px;
 }

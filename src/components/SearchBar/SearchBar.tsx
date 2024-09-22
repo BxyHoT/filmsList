@@ -2,6 +2,7 @@ import { Input } from "antd";
 import { ChangeEvent, Component } from "react";
 import debounce from "lodash.debounce";
 import "./SearchBar.css";
+import { ConfigProvider } from "antd";
 
 const { Search } = Input;
 
@@ -17,11 +18,19 @@ export class SearchBar extends Component<ISearchBarProps> {
 
   render() {
     return (
-      <Search
-        style={{ marginBottom: 20 }}
-        placeholder="Type to search..."
-        onChange={this.onChange}
-      />
+      <ConfigProvider
+        theme={{
+          token: {
+            borderRadius: 6,
+          },
+        }}
+      >
+        <Search
+          style={{ marginBottom: 20, borderRadius: 6 }}
+          placeholder="Type to search..."
+          onChange={this.onChange}
+        />
+      </ConfigProvider>
     );
   }
 }

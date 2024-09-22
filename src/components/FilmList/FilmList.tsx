@@ -4,7 +4,8 @@ import { FilmListItem } from "../FilmListItem/FilmListItem";
 import { MovieAPI } from "../../movieAPI/MovieAPI";
 import { Spin } from "antd";
 import { Alert } from "antd";
-import { IMovieResponce } from "../../movieAPI/MovieAPI";
+import { IMovieResponce, IGenre } from "../../movieAPI/MovieAPI";
+import { GenreProvaider } from "../Context/Context";
 
 export interface IMovie {
   id: number;
@@ -24,6 +25,7 @@ interface IFilmListState {
   currentPage: number;
   totalPages: number | null;
   isEmptyResponce: boolean;
+  genreList: IGenre[] | null;
 }
 
 interface IFilmListProps {
@@ -39,6 +41,7 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
     currentPage: 1,
     totalPages: null,
     isEmptyResponce: false,
+    genreList: null,
   };
 
   onError = () => {
@@ -86,6 +89,10 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
       .getAllMovies()
       .then((response) => this.onLoaded(response as IMovieResponce))
       .catch(this.onError);
+
+    this.movieAPI.getGenreArray().then((response) => {
+      this.setState({ genreList: response });
+    });
   }
 
   componentDidUpdate(prevProps: IFilmListProps, prevState: IFilmListState) {
@@ -101,11 +108,11 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
     }
 
     if (prevProps.searchType !== this.props.searchType) {
+      this.setState({ currentPage: 1 });
+
       if (this.props.searchType === "") {
         this.fetchByDefoult();
       } else {
-        this.setState({ currentPage: 1 });
-
         this.movieAPI
           .getAllMovies(1, this.props.searchType)
           .then((response) => this.onLoaded(response as IMovieResponce))
@@ -133,28 +140,30 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
     }
 
     return (
-      <div className="FilmList">
-        {isEmptyResponce && (
-          <Alert
-            type="warning"
-            description="Нет такого фильма("
-            closable
-          ></Alert>
-        )}
-        <Row gutter={[16, 16]}>
-          <FilmListItem films={movieList} />
-        </Row>
-        <Pagination
-          current={currentPage}
-          pageSize={this.ITEMS_PER_PAGE}
-          align="center"
-          style={{ marginTop: 16 }}
-          onChange={this.handleChange}
-          total={totalPages as unknown as number}
-          showSizeChanger={false}
-          hideOnSinglePage={isEmptyResponce}
-        />
-      </div>
+      <GenreProvaider value={this.state.genreList}>
+        <div className="FilmList">
+          {isEmptyResponce && (
+            <Alert
+              type="warning"
+              description="Нет такого фильма("
+              closable
+            ></Alert>
+          )}
+          <Row gutter={[16, 16]}>
+            <FilmListItem films={movieList} />
+          </Row>
+          <Pagination
+            current={currentPage}
+            pageSize={this.ITEMS_PER_PAGE}
+            align="center"
+            style={{ marginTop: 16 }}
+            onChange={this.handleChange}
+            total={totalPages as unknown as number}
+            showSizeChanger={false}
+            hideOnSinglePage={isEmptyResponce}
+          />
+        </div>
+      </GenreProvaider>
     );
   }
 }

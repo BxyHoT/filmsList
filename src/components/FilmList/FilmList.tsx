@@ -45,7 +45,6 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
   };
 
   onError = () => {
-    console.log("error yopta");
     this.setState({ error: true, loading: false });
   };
 
@@ -93,6 +92,9 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
     this.movieAPI.getGenreArray().then((response) => {
       this.setState({ genreList: response });
     });
+
+    const guest = this.movieAPI.guestSession();
+    console.log(guest);
   }
 
   componentDidUpdate(prevProps: IFilmListProps, prevState: IFilmListState) {

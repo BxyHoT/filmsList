@@ -3,6 +3,8 @@ import { Card } from "antd";
 import { CSSProperties } from "react";
 import { IMovie } from "../FilmList/FilmList";
 import { GenreConsumer } from "../Context/Context";
+import { Raiting } from "../Rate/Raiting";
+import { Score } from "../Score/Score";
 
 interface ICardProps {
   movie: IMovie;
@@ -30,7 +32,8 @@ const aboutStyle: CSSProperties = {
 export class FilmCard extends Component<ICardProps> {
   render() {
     const { movie } = this.props;
-    const { title, overview, realiseDate, posterPath, genreIds } = movie;
+    const { title, overview, realiseDate, posterPath, genreIds, voteAverage } =
+      movie;
 
     const getPoster = () => {
       if (posterPath !== "") {
@@ -47,9 +50,14 @@ export class FilmCard extends Component<ICardProps> {
           return (
             <Card style={cardStyle} cover={getPoster()}>
               <Card.Grid style={aboutStyle} hoverable={false}>
-                <h2 style={{ fontSize: 20, margin: 0, lineHeight: "28px" }}>
-                  {title}
-                </h2>
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <h2 style={{ fontSize: 20, margin: 0, lineHeight: "28px" }}>
+                    {title}
+                  </h2>
+                  <Score score={voteAverage}></Score>
+                </div>
                 <p
                   style={{
                     fontSize: 12,
@@ -103,6 +111,7 @@ export class FilmCard extends Component<ICardProps> {
                   </p>
                 )}
                 <p style={{ fontSize: 12, marginTop: 5 }}>{overview}</p>
+                <Raiting></Raiting>
               </Card.Grid>
             </Card>
           );

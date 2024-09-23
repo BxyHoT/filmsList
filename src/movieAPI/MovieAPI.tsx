@@ -136,10 +136,15 @@ export class MovieAPI {
       });
   };
 
-  guestSession = async () => {
+  guestSession = async (): Promise<string> => {
     return await this.getResurce(
       "https://api.themoviedb.org/3/authentication/guest_session/new"
-    );
+    )
+      .then((responce) => responce.guest_session_id)
+      .catch((err) => {
+        console.error("ошибочка" + err);
+        return "Error";
+      });
   };
 
   async setScore(score: string, guestSession: string, id: number) {

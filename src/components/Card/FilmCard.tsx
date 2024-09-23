@@ -32,8 +32,15 @@ const aboutStyle: CSSProperties = {
 export class FilmCard extends Component<ICardProps> {
   render() {
     const { movie } = this.props;
-    const { title, overview, realiseDate, posterPath, genreIds, voteAverage } =
-      movie;
+    const {
+      title,
+      overview,
+      realiseDate,
+      posterPath,
+      genreIds,
+      voteAverage,
+      id,
+    } = movie;
 
     const getPoster = () => {
       if (posterPath !== "") {
@@ -46,7 +53,7 @@ export class FilmCard extends Component<ICardProps> {
 
     return (
       <GenreConsumer>
-        {(genreList) => {
+        {(value) => {
           return (
             <Card style={cardStyle} cover={getPoster()}>
               <Card.Grid style={aboutStyle} hoverable={false}>
@@ -72,7 +79,7 @@ export class FilmCard extends Component<ICardProps> {
                   genreIds.map((genreId) => {
                     let genre = "";
 
-                    genreList?.forEach(({ name, id }) => {
+                    value?.genreList?.forEach(({ name, id }) => {
                       if (id === genreId) {
                         genre = name;
                       }
@@ -111,7 +118,7 @@ export class FilmCard extends Component<ICardProps> {
                   </p>
                 )}
                 <p style={{ fontSize: 12, marginTop: 5 }}>{overview}</p>
-                <Raiting></Raiting>
+                <Raiting id={id}></Raiting>
               </Card.Grid>
             </Card>
           );

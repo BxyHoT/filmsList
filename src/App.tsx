@@ -1,6 +1,7 @@
 import { Component, ReactNode } from "react";
 import { SearchBar } from "./components/SearchBar/SearchBar";
 import { FilmList } from "./components/FilmList/FilmList";
+import { Tabs } from "antd";
 import "./App.css";
 
 interface IAppState {
@@ -17,10 +18,24 @@ class App extends Component<object, IAppState> {
     const { searchType } = this.state;
 
     return (
-      <>
-        <SearchBar handleChengeSearchType={this.handleChengeSearchType} />
-        <FilmList searchType={searchType} />
-      </>
+      <Tabs
+        centered
+        items={[
+          {
+            key: "1",
+            label: "Search",
+            children: (
+              <>
+                <SearchBar
+                  handleChengeSearchType={this.handleChengeSearchType}
+                />
+                <FilmList searchType={searchType} />
+              </>
+            ),
+          },
+          { key: "2", label: "Rated", children: "Будет контент" },
+        ]}
+      />
     );
   }
 }

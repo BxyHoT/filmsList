@@ -4,7 +4,7 @@ import { FilmListItem } from "../FilmListItem/FilmListItem";
 import { MovieAPI } from "../../movieAPI/MovieAPI";
 import { Spin } from "antd";
 import { Alert } from "antd";
-import { IMovieResponce, IGenre } from "../../movieAPI/MovieAPI";
+import { IMovieResponce, IGenre, IRated } from "../../movieAPI/MovieAPI";
 import { GenreProvaider } from "../Context/Context";
 
 export interface IMovie {
@@ -26,6 +26,8 @@ interface IFilmListState {
   totalPages: number | null;
   isEmptyResponce: boolean;
   genreList: IGenre[] | null;
+  guestSessionId: string;
+  rated: null | IRated[];
 }
 
 interface IFilmListProps {
@@ -42,6 +44,8 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
     totalPages: null,
     isEmptyResponce: false,
     genreList: null,
+    guestSessionId: "",
+    rated: null,
   };
 
   onError = () => {
@@ -93,8 +97,14 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
       this.setState({ genreList: response });
     });
 
-    const guest = this.movieAPI.guestSession();
-    console.log(guest);
+    this.movieAPI
+      .guestSession()
+      .then((id) => {
+        this.setState({ guestSessionId: id });
+      })
+      .catch((err) => {
+        this.setState({ guestSessionId: err });
+      });
   }
 
   componentDidUpdate(prevProps: IFilmListProps, prevState: IFilmListState) {
@@ -107,6 +117,15 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
           .then((response) => this.onLoaded(response as IMovieResponce))
           .catch(this.onError);
       }
+
+      this.movieAPI
+        .getRaited(this.state.guestSessionId, this.state.currentPage)
+        .then((res) => {
+          this.setState({ rated: res!.movieList });
+        })
+        .catch(() => {
+          this.setState({ rated: null });
+        });
     }
 
     if (prevProps.searchType !== this.props.searchType) {
@@ -131,6 +150,7 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
       error,
       totalPages,
       isEmptyResponce,
+      guestSessionId,
     } = this.state;
 
     if (loading) {
@@ -142,7 +162,13 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
     }
 
     return (
-      <GenreProvaider value={this.state.genreList}>
+      <GenreProvaider
+        value={{
+          genreList: this.state.genreList,
+          setScore: this.movieAPI.setScore,
+          guestSession: guestSessionId,
+        }}
+      >
         <div className="FilmList">
           {isEmptyResponce && (
             <Alert

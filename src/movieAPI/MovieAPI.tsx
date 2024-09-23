@@ -18,6 +18,32 @@ interface MovieDTO {
   vote_count: number;
 }
 
+interface RatedDTO {
+  adult: boolean; // Defaults to true
+  backdrop_path: string;
+  genre_ids: number[]; // Array of integers
+  id: number; // Defaults to 0
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number; // Defaults to 0
+  poster_path: string;
+  release_date: string;
+  title: string;
+  video: boolean; // Defaults to true
+  vote_average: number; // Defaults to 0
+  vote_count: number; // Defaults to 0
+  rating: number; // Defaults to 0
+}
+
+export interface IRated extends IMovie {
+  rating: number;
+}
+export interface IRatedResponce {
+  movieList: IRated[];
+  totalPages: number;
+}
+
 export interface IMovieResponce {
   movieList: IMovie[] | [];
   totalPages: number;
@@ -140,26 +166,29 @@ export class MovieAPI {
     return await this.getResurce(
       "https://api.themoviedb.org/3/authentication/guest_session/new"
     )
-      .then((responce) => responce.guest_session_id)
+      .then((responce) => {
+        return responce.guest_session_id;
+      })
       .catch((err) => {
         console.error("ошибочка" + err);
         return "Error";
       });
   };
 
-  async setScore(score: string, guestSession: string, id: number) {
+  async setScore(score: number, id: number, guestSessionId: string) {
     const options = {
       method: "POST",
       headers: {
         accept: "application/json",
         "Content-Type": "application/json;charset=utf-8",
-        Authorization: this.Authorization,
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkMWNiMGQzOTNhZWM4OTY3NzJiNjNhNDU1MTlkMzUxZiIsIm5iZiI6MTcyNzExMDgyMS43Nzk5MDMsInN1YiI6IjY2ZTAzYTJkMDAwMDAwMDAwMGE0NmFiMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.fHglcVtSLxCjUYkUt4llyLK9pxbgV0gMoQEqDcdLaLE",
       },
       body: JSON.stringify({ value: score }),
     };
 
     return await fetch(
-      `https://api.themoviedb.org/3/movie/${id}}/rating?guest_session_id=${guestSession}`,
+      `https://api.themoviedb.org/3/movie/${id}}/rating?guest_session_id=${guestSessionId}`,
       options
     )
       .then((response) => response.json())
@@ -167,7 +196,7 @@ export class MovieAPI {
       .catch((err) => console.error(err));
   }
 
-  async getRaited(guestSession: string) {
+  async getRaited(guestSession: string, page: number = 1) {
     const options = {
       method: "GET",
       headers: {
@@ -176,12 +205,77 @@ export class MovieAPI {
       },
     };
 
-    return await fetch(
-      `https://api.themoviedb.org/3/guest_session/${guestSession}/rated/movies?language=en-US&page=1&sort_by=created_at.asc`,
+    const responce = await fetch(
+      `https://api.themoviedb.org/3/guest_session/${guestSession}/rated/movies?language=en-US&page=${page}&sort_by=created_at.asc`,
       options
-    )
-      .then((response) => response.json())
-      .then((response) => console.log(response))
-      .catch((err) => console.error(err));
+    );
+
+    if (!responce.ok) {
+      throw new Error(`Ошибка ответа на гостевую сессию`);
+    }
+
+    return await responce
+      .json()
+      .then((movies): IRatedResponce => {
+        const totalPages: number = movies.total_results;
+
+        if (movies.results.length === 0) {
+          return {
+            movieList: [],
+            totalPages,
+          };
+        }
+
+        const movieList = movies.results.map(
+          ({
+            id,
+            overview,
+            release_date,
+            vote_average,
+            popularity,
+            poster_path,
+            title,
+            genre_ids,
+            rating,
+          }: RatedDTO) => {
+            let date: Date | string;
+
+            if (release_date === "") {
+              date = "No date";
+            } else {
+              date = parseISO(release_date);
+              date = format(date, "MMMM d, yyyy");
+            }
+
+            let posterPath;
+
+            if (poster_path === null) {
+              posterPath = "";
+            } else {
+              posterPath = "https://image.tmdb.org/t/p/w500" + poster_path;
+            }
+
+            return {
+              id,
+              popularity,
+              title,
+              overview: this.getTrimOwerview(overview, title),
+              realiseDate: date,
+              voteAverage: vote_average,
+              posterPath: posterPath,
+              genreIds: genre_ids,
+              rating,
+            };
+          }
+        );
+        return {
+          totalPages,
+          movieList,
+        };
+      })
+      .catch((err) => {
+        console.error("Ошибка фетча ", err);
+        return null;
+      });
   }
 }

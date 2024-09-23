@@ -8,7 +8,6 @@ interface IScoreProps {
 export class Score extends Component<IScoreProps> {
   render(): ReactNode {
     const score = this.props.score;
-    console.log(score);
 
     let strokeColor: string = "";
     if (score < 3) strokeColor = "#E90000";
@@ -23,6 +22,7 @@ export class Score extends Component<IScoreProps> {
         strokeColor={strokeColor}
         format={(percent) => percent! / 10}
         percent={Number(score.toFixed(1)) * 10}
+        style={{ marginLeft: "5px" }}
       />
     );
   }

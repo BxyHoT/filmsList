@@ -121,6 +121,14 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
           });
       } else {
         this.setState({ guestSessionId: this.props.guestSession });
+        this.movieAPI
+          .getRaited(this.props.guestSession, 1)
+          .then((res) => {
+            this.setState({ rated: res!.movieList, loading: false });
+          })
+          .catch(() => {
+            this.setState({ rated: null, loading: false });
+          });
       }
     } else
       this.setState({
@@ -195,6 +203,8 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
     if (error) {
       return <Alert type="error" message="Ошибка запроса" closable />;
     }
+
+    console.log(guestSessionId);
 
     return (
       <GenreProvaider

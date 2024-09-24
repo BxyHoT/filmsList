@@ -13,7 +13,7 @@ export class Raiting extends Component<IRaitingProps> {
     scoreValue: 0,
   };
 
-  componentWillUnmount(): void {
+  componentDidMount(): void {
     if (this.props.rated !== null) {
       this.props.rated.forEach(({ id: idRated, rating }) => {
         if (idRated === this.props.id) {

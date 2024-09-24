@@ -16,6 +16,10 @@ export class SearchBar extends Component<ISearchBarProps> {
     handleChengeSearchType(event.target.value);
   }, 1500);
 
+  componentWillUnmount(): void {
+    this.props.handleChengeSearchType("return");
+  }
+
   render() {
     return (
       <ConfigProvider

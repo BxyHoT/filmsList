@@ -23,6 +23,18 @@ export class Raiting extends Component<IRaitingProps> {
     }
   }
 
+  componentDidUpdate(prevProps: Readonly<IRaitingProps>): void {
+    if (prevProps.rated !== this.props.rated) {
+      if (this.props.rated !== null) {
+        this.props.rated.forEach(({ id: idRated, rating }) => {
+          if (idRated === this.props.id) {
+            this.setState({ scoreValue: rating });
+          }
+        });
+      }
+    }
+  }
+
   render(): ReactNode {
     return (
       <GenreConsumer>

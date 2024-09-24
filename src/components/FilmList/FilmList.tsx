@@ -125,6 +125,7 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
           .getRaited(this.props.guestSession, 1)
           .then((res) => {
             this.setState({ rated: res!.movieList, loading: false });
+            console.log(res);
           })
           .catch(() => {
             this.setState({ rated: null, loading: false });

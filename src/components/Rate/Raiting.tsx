@@ -13,18 +13,20 @@ export class Raiting extends Component<IRaitingProps> {
     scoreValue: 0,
   };
 
+  componentWillUnmount(): void {
+    if (this.props.rated !== null) {
+      this.props.rated.forEach(({ id: idRated, rating }) => {
+        if (idRated === this.props.id) {
+          this.setState({ scoreValue: rating });
+        }
+      });
+    }
+  }
+
   render(): ReactNode {
     return (
       <GenreConsumer>
         {(values) => {
-          if (this.props.rated !== null) {
-            this.props.rated.forEach(({ id: idRated, rating }) => {
-              if (idRated === this.props.id) {
-                this.setState({ scoreValue: rating });
-              }
-            });
-          }
-
           let error: null | string = null;
 
           if (values?.guestSession === "Error") {

@@ -5,7 +5,7 @@ import { FilmCard } from "../Card/FilmCard";
 import { IRated } from "../../movieAPI/MovieAPI";
 
 interface IFilmListItemProps {
-  films: IMovie[];
+  films: IMovie[] | IRated[];
   rated: IRated[] | null;
 }
 

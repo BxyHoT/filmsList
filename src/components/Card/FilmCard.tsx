@@ -5,9 +5,11 @@ import { IMovie } from "../FilmList/FilmList";
 import { GenreConsumer } from "../Context/Context";
 import { Raiting } from "../Rate/Raiting";
 import { Score } from "../Score/Score";
+import { IRated } from "../../movieAPI/MovieAPI";
 
 interface ICardProps {
   movie: IMovie;
+  rated: IRated[] | null;
 }
 
 const cardStyle: CSSProperties = {
@@ -31,7 +33,7 @@ const aboutStyle: CSSProperties = {
 
 export class FilmCard extends Component<ICardProps> {
   render() {
-    const { movie } = this.props;
+    const { movie, rated } = this.props;
     const {
       title,
       overview,
@@ -118,7 +120,7 @@ export class FilmCard extends Component<ICardProps> {
                   </p>
                 )}
                 <p style={{ fontSize: 12, marginTop: 5 }}>{overview}</p>
-                <Raiting id={id}></Raiting>
+                <Raiting id={id} rated={rated}></Raiting>
               </Card.Grid>
             </Card>
           );

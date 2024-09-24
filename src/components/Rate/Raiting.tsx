@@ -2,9 +2,11 @@ import { Component, ReactNode } from "react";
 import { Rate } from "antd";
 import { GenreConsumer } from "../Context/Context";
 import { Alert } from "antd";
+import { IRated } from "../../movieAPI/MovieAPI";
 
 interface IRaitingProps {
   id: number;
+  rated: IRated[] | null;
 }
 export class Raiting extends Component<IRaitingProps> {
   state = {
@@ -15,7 +17,13 @@ export class Raiting extends Component<IRaitingProps> {
     return (
       <GenreConsumer>
         {(values) => {
-          console.log(values?.guestSession);
+          if (this.props.rated !== null) {
+            this.props.rated.forEach(({ id: idRated, rating }) => {
+              if (idRated === this.props.id) {
+                this.setState({ scoreValue: rating });
+              }
+            });
+          }
 
           let error: null | string = null;
 

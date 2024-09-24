@@ -119,7 +119,7 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
       }
 
       this.movieAPI
-        .getRaited(this.state.guestSessionId, this.state.currentPage)
+        .getRaited(this.state.guestSessionId, 1)
         .then((res) => {
           this.setState({ rated: res!.movieList });
         })
@@ -151,6 +151,7 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
       totalPages,
       isEmptyResponce,
       guestSessionId,
+      rated,
     } = this.state;
 
     if (loading) {
@@ -160,6 +161,8 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
     if (error) {
       return <Alert type="error" message="Ошибка запроса" closable />;
     }
+
+    console.log(rated);
 
     return (
       <GenreProvaider
@@ -178,7 +181,7 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
             ></Alert>
           )}
           <Row gutter={[16, 16]}>
-            <FilmListItem films={movieList} />
+            <FilmListItem films={movieList} rated={rated} />
           </Row>
           <Pagination
             current={currentPage}

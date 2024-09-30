@@ -1,10 +1,12 @@
 import { Component } from "react";
-import { Row, Pagination } from "antd";
+import { Row, Pagination, Spin, Alert } from "antd";
 import { FilmListItem } from "../FilmListItem/FilmListItem";
-import { MovieAPI } from "../../movieAPI/MovieAPI";
-import { Spin } from "antd";
-import { Alert } from "antd";
-import { IMovieResponce, IGenre, IRated } from "../../movieAPI/MovieAPI";
+import {
+  IMovieResponce,
+  IGenre,
+  IRated,
+  MovieAPI,
+} from "../../movieAPI/MovieAPI";
 import { GenreProvaider } from "../Context/Context";
 
 export interface IMovie {
@@ -85,51 +87,58 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
     this.setState({ loading: true, currentPage: page });
   };
 
-  fetchByDefoult = () => {
+  getAllMovies(page = 1, searchType = "return") {
     this.movieAPI
-      .getAllMovies(this.state.currentPage, "return")
+      .getAllMovies(page, searchType)
       .then((response) => this.onLoaded(response as IMovieResponce))
       .catch(this.onError);
-  };
+  }
+
+  getGenreList() {
+    this.movieAPI.getGenreArray().then((response) => {
+      this.setState({ genreList: response });
+      this.props.handleSetGenreList!(response);
+    });
+  }
+
+  getGuestSession() {
+    this.movieAPI
+      .guestSession()
+      .then((id) => {
+        this.setState({ guestSessionId: id });
+        this.props.handleSetGuestSession!(id);
+      })
+      .catch((err) => {
+        this.setState({ guestSessionId: err });
+        this.props.handleSetGuestSession!(err);
+      });
+  }
+
+  getRaited() {
+    this.movieAPI
+      .getRaited(this.props.guestSession, 1)
+      .then((res) => {
+        this.setState({ rated: res!.movieList, loading: false });
+        console.log(res);
+      })
+      .catch(() => {
+        this.setState({ rated: null, loading: false });
+      });
+  }
 
   componentDidMount() {
     if (this.props.type === "1") {
-      this.movieAPI
-        .getAllMovies()
-        .then((response) => this.onLoaded(response as IMovieResponce))
-        .catch(this.onError);
+      this.getAllMovies();
 
-      if (this.props.genreList === null) {
-        this.movieAPI.getGenreArray().then((response) => {
-          this.setState({ genreList: response });
-          this.props.handleSetGenreList!(response);
-        });
-      } else {
-        this.setState({ genreList: this.props.genreList });
-      }
+      void (this.props.genreList === null
+        ? this.getGenreList()
+        : this.setState({ genreList: this.props.genreList }));
 
       if (this.props.guestSession === "Error") {
-        this.movieAPI
-          .guestSession()
-          .then((id) => {
-            this.setState({ guestSessionId: id });
-            this.props.handleSetGuestSession!(id);
-          })
-          .catch((err) => {
-            this.setState({ guestSessionId: err });
-            this.props.handleSetGuestSession!(err);
-          });
+        this.getGuestSession();
       } else {
         this.setState({ guestSessionId: this.props.guestSession });
-        this.movieAPI
-          .getRaited(this.props.guestSession, 1)
-          .then((res) => {
-            this.setState({ rated: res!.movieList, loading: false });
-            console.log(res);
-          })
-          .catch(() => {
-            this.setState({ rated: null, loading: false });
-          });
+        this.getRaited();
       }
     } else
       this.setState({
@@ -137,14 +146,7 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
         genreList: this.props.genreList,
       });
 
-    this.movieAPI
-      .getRaited(this.props.guestSession, 1)
-      .then((res) => {
-        this.setState({ rated: res!.movieList, loading: false });
-      })
-      .catch(() => {
-        this.setState({ rated: null, loading: false });
-      });
+    this.getRaited();
   }
 
   componentDidUpdate(prevProps: IFilmListProps, prevState: IFilmListState) {
@@ -152,36 +154,19 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
       this.state.currentPage !== prevState.currentPage &&
       this.props.type === "1"
     ) {
-      if (this.props.searchType === "") {
-        this.fetchByDefoult();
-      } else {
-        this.movieAPI
-          .getAllMovies(this.state.currentPage, this.props.searchType)
-          .then((response) => this.onLoaded(response as IMovieResponce))
-          .catch(this.onError);
-      }
+      void (this.props.searchType === ""
+        ? this.getAllMovies()
+        : this.getAllMovies(this.state.currentPage, this.props.searchType));
 
-      this.movieAPI
-        .getRaited(this.state.guestSessionId, 1)
-        .then((res) => {
-          this.setState({ rated: res!.movieList });
-        })
-        .catch(() => {
-          this.setState({ rated: null });
-        });
+      this.getRaited();
     }
 
     if (prevProps.searchType !== this.props.searchType) {
       this.setState({ currentPage: 1 });
 
-      if (this.props.searchType === "") {
-        this.fetchByDefoult();
-      } else {
-        this.movieAPI
-          .getAllMovies(1, this.props.searchType)
-          .then((response) => this.onLoaded(response as IMovieResponce))
-          .catch(this.onError);
-      }
+      void (this.props.searchType === ""
+        ? this.getAllMovies()
+        : this.getAllMovies(1, this.props.searchType));
     }
   }
 
@@ -217,18 +202,14 @@ export class FilmList extends Component<IFilmListProps, IFilmListState> {
       >
         <div className="FilmList">
           {isEmptyResponce && (
-            <Alert
-              type="warning"
-              description="Нет такого фильма("
-              closable
-            ></Alert>
+            <Alert type="warning" description="Нет такого фильма(" closable />
           )}
           {this.props.type === "2" && !rated && (
             <Alert
               type="warning"
               description="Нет оцененных фильмов"
               closable
-            ></Alert>
+            />
           )}
           <Row gutter={[16, 16]}>
             <FilmListItem

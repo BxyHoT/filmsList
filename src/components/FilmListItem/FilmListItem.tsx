@@ -14,7 +14,7 @@ export class FilmListItem extends Component<IFilmListItemProps> {
     const { films, rated } = this.props;
     const filmList = films.map((movie) => (
       <Col span={12} key={movie.id}>
-        <FilmCard movie={movie} rated={rated}></FilmCard>
+        <FilmCard movie={movie} rated={rated} />
       </Col>
     ));
 

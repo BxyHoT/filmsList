@@ -120,7 +120,7 @@ export class FilmCard extends Component<ICardProps> {
                   </p>
                 )}
                 <p style={{ fontSize: 12, marginTop: 5 }}>{overview}</p>
-                <Raiting id={id} rated={rated}></Raiting>
+                <Raiting id={id} rated={rated} />
               </Card.Grid>
             </Card>
           );

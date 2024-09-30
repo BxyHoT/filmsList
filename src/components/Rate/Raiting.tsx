@@ -59,11 +59,7 @@ export class Raiting extends Component<IRaitingProps> {
                 }}
               />
               {error && (
-                <Alert
-                  type="warning"
-                  message="ОЦЕНКИ НЕ БУДЕТ"
-                  closable
-                ></Alert>
+                <Alert type="warning" message="ОЦЕНКИ НЕ БУДЕТ" closable />
               )}
             </>
           );
